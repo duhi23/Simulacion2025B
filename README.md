@@ -3,9 +3,12 @@ Repositorio creado para la materia de Simulación en el semestre 2025-B
 Contenidos
 - Desarrollo de aplicativos web
 - Generación de números aleatorios
-- Genración de variables aleatorios
+- Generación de variables aleatorios
     - Discretas
     - Continuas
+- Generación de Procesos Poisson
+- Movimiento Browniano
+- Black Scholes
 
  <img src="https://www.processmaker.com/wp-content/uploads/2021/07/simulation-modeling-process-mining-768x614.jpg" width="300px">
 
