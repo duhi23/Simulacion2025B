@@ -1,0 +1,173 @@
+---
+title: "Guía para sincronizar GitHub con RStudio"
+author: "Diego Paúl Huaraca S."
+date: "2025-09-30"
+format: html
+toc: true
+number-sections: true
+---
+
+# Introducción
+
+Esta guía resume los principales pasos a realizar para **vincular RStudio con una cuentan de GitHub**, permitiendo versionar proyectos, trabajar en equipo y mantener un flujo de trabajo reproducible.
+
+Usar GitHub junto con RStudio tiene el poder de revolucionar la forma en que trabaja en R.
+
+## ¿Por qué debería usar Git y GitHub?
+
+-   **Control de versiones**: Permite rastrear cambios en el código y revertir a versiones anteriores si es necesario.\
+
+-   **Colaboración**: Facilita el trabajo en equipo, permitiendo que varios usuarios trabajen en el mismo proyecto sin conflictos.\
+
+-   **Reproducibilidad**: Mantiene un historial claro de cambios, lo que es crucial para la investigación científica y académica.
+
+-   **Integración con RStudio**: RStudio ofrece una interfaz amigable para trabajar con Git y GitHub, simplificando muchas tareas comunes.
+
+------------------------------------------------------------------------
+
+## Requisitos previos
+
+Antes de comenzar, asegúrate de tener:
+
+-   Una cuenta en [GitHub](https://github.com)\
+
+-   **R** y **RStudio** instalados (es posible realizar la vinculación de la cuenta GitHub con otros IDES, por ejemplo: Positron, Visual Studio Code de manera análoga.)\
+
+-   **Git** instalado en tu computadora (verifica con `git --version` en la terminal), de lo contrario puedes descargarlo [Git](https://git-scm.com/downloads)\
+
+------------------------------------------------------------------------
+
+# Resumen de pasos a seguir
+
+A continuación, se describen los pasos a dentro de una configuración tradicional.
+
+## Paso 1: Configurar Git en tu equipo
+
+Abre la terminal (o la consola en RStudio) y ejecuta los siguientes comandos de manera separada:
+
+```{r}
+#| eval: false
+#| echo: true
+git config --global user.name "UsuarioGitHub"
+git config --global user.email "tu_correo_registrado@ejemplo.com"
+```
+
+📌 Estos datos deben coincidir con los de tu cuenta en GitHub.
+
+------------------------------------------------------------------------
+
+## Paso 2: Crear un repositorio en GitHub
+
+1.  Ingresa a tu cuenta de GitHub y haz clic en **New Repository**.\
+
+2.  Asigna un nombre, una descripción y elige si será público o privado (de manera que sea visible o no dentro de la web).\
+
+3.  No es obligatorio inicializar con **README** (en el caso que el proyecto conlleve el desarrollo de gran cantidad de código es recomendable presentar una descripción amplia del código almacenado en el repositorio).
+
+```{mermaid}
+flowchart TD
+  A[GitHub] --> B[New Repository]
+  B --> C[Asignar nombre y opciones]
+  C --> D[Crear repositorio vacío]
+```
+
+------------------------------------------------------------------------
+
+## Paso 3: Conectar RStudio con GitHub
+
+En RStudio:
+
+1.  **Crear un nuevo proyecto**:
+    -   `File` → `New Project` → `Version Control` → `Git`\
+    
+2.  Ingresa la **URL del repositorio de GitHub**.\
+
+    -   La URL se encuentra en la página del repositorio en GitHub, botón `Code` → `HTTPS` → `copiar URL`.\
+    
+3.  Selecciona la carpeta local donde se guardará el proyecto.
+
+```{mermaid}
+flowchart LR
+  A[RStudio] --> B[New Project]
+  B --> C[Version Control]
+  C --> D[Git]
+  D --> E[Ingresar URL de GitHub]
+```
+
+------------------------------------------------------------------------
+
+## Paso 4: Autenticación con GitHub
+
+Desde 2022, GitHub **no permite autenticación por medio de contraseña**. Para la autenticación se debe usar un **Token Personal de Acceso (PAT)** (mayor seguridad en la transmisión de datos).
+
+1.  En GitHub, ir a:
+    -   `Settings` → `Developer settings` → `Personal access tokens` → `Generate new token` \
+    
+2.  Generar un nuevo **token clásico** con permisos: `repo`, `workflow` y `user`.\
+
+3.  Clic en el botón **Generate token**.
+
+4.  Copie el token obtenido para usarlo en la autenticación desde git (por ejemplo: ghp_XXXYYY1234ZZZZ4672Fefghh).
+
+En RStudio, usar el paquete **`gitcreds`**:
+
+```{r}
+#| eval: false
+#| echo: true
+install.packages("gitcreds")
+library(gitcreds)
+
+# Configurar las credenciales
+gitcreds_set()
+
+# Visualizar las credenciales
+gitcreds_get()
+```
+
+👉 Pega tu **PAT** cuando lo solicite.
+
+Este último paso es crucial para evitar la autenticación por contraseña en cada operación con GitHub.
+
+------------------------------------------------------------------------
+
+## Paso 5: Flujo básico de trabajo
+
+A partir de aquí, podrás trabajar con Git y GitHub directamente desde RStudio.
+
+| Acción            | Comando Git               | Desde RStudio               |
+|-------------------|--------------------------|----------------------------|
+| Ver estado        | `git status`              | Botón *Git → Commit*        |
+| Añadir cambios    | `git add archivo.R`       | Marcar archivo en panel Git |
+| Guardar commit    | `git commit -m "mensaje"` | Botón *Commit*              |
+| Subir a GitHub    | `git push`                | Botón *Push*                |
+| Descargar cambios | `git pull`                | Botón *Pull*                |
+
+------------------------------------------------------------------------
+
+## Esquema general del proceso
+
+```{mermaid}
+
+sequenceDiagram
+  participant RStudio
+  participant GitHub
+  RStudio->>GitHub: git push (subir cambios)
+  GitHub->>RStudio: git pull (descargar cambios)
+```
+
+- **Push**: Envía los cambios locales al repositorio remoto en GitHub.\
+- **Pull**: Trae los cambios del repositorio remoto a tu copia local.
+
+------------------------------------------------------------------------
+
+# Conclusión
+
+Ahora tienes configurado un flujo de trabajo completo:
+
+-   Creas proyectos en RStudio.\
+-   Versionas el código con Git.\
+-   Sincronizas los cambios con GitHub.
+
+Esto fomenta la **colaboración**, la **reproducibilidad** y las **buenas prácticas académicas y científicas**.
+
+------------------------------------------------------------------------
