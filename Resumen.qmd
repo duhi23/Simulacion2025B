@@ -27,3 +27,16 @@ Reciclaje de elementos de un vector
 c(1,4,6) + 4
 ```
 
+
+Producto de dos vectores
+```{r}
+3*c(1,4,6)
+```
+
+otro ejemplo:
+```{r}
+c(1,4,6)*c(-2,6,9)
+```
+
+
+

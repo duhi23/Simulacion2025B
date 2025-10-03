@@ -1,0 +1,77 @@
+---
+title: "Análisis de las cotizaciones de Apple, Microsoft y Futuros del Oro"
+author: "Diego Paúl Huaraca S."
+date: "2025-10-01"
+format:
+      html: default
+execute:
+      echo: true
+      warning: false
+      error: true
+lang: es
+---
+
+# Instalación y carga de paquetes
+
+Para la descarga de las cotizaciones usaremos `tidyquant` que a su vez usa `quantmod` y `tseries`, además para la manipulación de datos usaremos `tidyverse` y `lubridate` para manejar fechas.
+
+```{r}
+library(tidyverse)
+library(tidyquant)
+library(lubridate)
+library(scales)
+```
+
+# Descarga de cotizaciones
+
+Es necesario fijar la fecha de inicio y fin del periodo a analizar, por defecto se usan los últimos 2 años. También se define el directorio de salida para guardar los resultados.
+
+```{r}
+empresas <- c("AAPL", "MSFT", "GC=F")
+fecha_fin <- today()
+fecha_inicio <- fecha_fin - years(2)
+cat("Empresas:", paste(empresas, collapse = ", "), "\n")
+cat("Periodo:", as.character(fecha_inicio), "a", as.character(fecha_fin), "\n")
+```
+
+Posteriormente, se definen los valores a mostrar en la tabla de cotizaciones.
+
+```{r}
+precios <- tq_get(empresas, get = "stock.prices", from = fecha_inicio, to = fecha_fin) %>%
+select(symbol, date, open, high, low, close, adjusted)
+fs::dir_create("precios")
+write_csv(precios, "precios/cotizaciones_acciones.csv")
+```
+
+# Mostrar primeras filas
+
+```{r}
+precios %>% group_by(symbol) %>% slice_head(n = 3)
+```
+
+# Cálculo de retornos diarios logarítmicos y estadísticas resumen
+
+```{r}
+precios_returns <- precios %>% group_by(symbol) %>% arrange(date) %>%
+mutate(return_log = log(adjusted / lag(adjusted))) %>% ungroup()
+
+summary_stats <- precios_returns %>% group_by(symbol) %>%
+summarise(
+      n_obs = sum(!is.na(return_log)),
+      precio_ultimo = last(adjusted),
+      precio_prev = nth(adjusted, -1),
+      cambio_pct_ultimo = 100*( (last(adjusted) / nth(adjusted, -1)) - 1 ),
+      retorno_medio_diario = mean(return_log, na.rm = TRUE),
+      sd_retorno = sd(return_log, na.rm = TRUE),
+      retorno_anualizado = retorno_medio_diario * 252,
+      volatilidad_anualizada = sd_retorno * sqrt(252)
+      ) %>% arrange(desc(precio_ultimo))
+
+summary_stats %>% mutate(across(where(is.numeric), ~ round(., 6)))
+```
+
+```{r}
+latest_table <- precios %>% group_by(symbol) %>% dplyr::filter(date == max(date)) %>%
+ungroup() %>% select(symbol, date, close, adjusted)
+latest_table
+```
