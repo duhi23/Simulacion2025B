@@ -1,0 +1,10 @@
+project:
+  type: website
+  output-dir: docs
+  
+# website: 
+#   title: "Slides_Simulacion"
+#   navbar: 
+#   left:
+#   - href: index.qmd
+  
